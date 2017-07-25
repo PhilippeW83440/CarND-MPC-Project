@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wall   CMakeFiles/test1.dir/test1.cpp.o  -o test1  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lipopt 
