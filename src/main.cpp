@@ -92,6 +92,8 @@ int main() {
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
 
+          // XXX: convert v from mph top m/s
+
           /*
           * TODO: Calculate steering angle and throttle using MPC.
           *
@@ -100,6 +102,21 @@ int main() {
           */
           double steer_value;
           double throttle_value;
+
+          assert(ptsx.size() == ptsy.size());
+          Eigen::VectorXd xvals(ptsx.size());
+          Eigen::VectorXd yvals(ptsy.size());
+
+          // tranform to vehicule coordinates
+          for (size_t i = 0; i < ptsx.size(); i++) {
+            double x = ptsx[i] - px;
+            double y = ptsy[i] - py;
+
+            xvals[i] = x * cos(-psi) - y * sin(-psi);
+            yvals[i] = x * sin(-psi) + y * cos(-psi);
+          }
+
+          auto coeffs = polyfit(xvals, yvals, 3);
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
