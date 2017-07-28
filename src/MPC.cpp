@@ -25,7 +25,7 @@ const double Lf = 2.67;
 // NOTE: feel free to play around with this
 // or do something completely different
 
-double ref_v = 50;
+double ref_v = 130;
 
 // The solver takes all the state variables and actuator
 // variables in a singular vector. Thus, we should to establish

@@ -123,7 +123,7 @@ int main() {
           px = 0;
           py = 0;
           psi = 0;
-          v *= 0.44704; // mph -> m/s
+          // XXX v *= 0.44704; // mph -> m/s
           // calculate the cross track error
           double cte = polyeval(coeffs, px) - py;
           // calculate the orientation error
