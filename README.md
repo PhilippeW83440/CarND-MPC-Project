@@ -1,6 +1,25 @@
 # CarND-Controls-MPC
 Self-Driving Car Engineer Nanodegree Program
 
+## Description
+
+### Model
+
+A simple kinematic model is used.
+
+### Timestep Length and Elapsed Duration (N & dt)
+
+N=10 and dt=100ms is used so that we are working on 1 second of data.
+
+### Polynomial Fitting and MPC Preprocessing
+
+Coordinates are transformed into vehicule coordinate system.
+Then a 3rd order polynomial fit is used to approximate the planned trajectory. 
+
+### Model Predictive Control with Latency
+
+We are running a simulation using the vehicle model starting from the current state for the duration of the latency. The resulting state from the simulation is the new initial state for MPC.
+
 ---
 
 ## Dependencies
