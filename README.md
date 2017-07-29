@@ -5,7 +5,58 @@ Self-Driving Car Engineer Nanodegree Program
 
 ### Model
 
+State variables:
+* px
+* py
+* psi
+* v
+
+Errors:
+* cte
+* epsi
+
 A simple kinematic model is used.
+
+```cpp
+          px[t+dt] = px[t] + v[t] * cos(psi[t]) * dt;
+          py[t+dt] = py[dt] + v[t] * sin(psi[t]) * dt;
+          psi[t+dt] = psi[t] - v[t] * delta[t] / Lf * dt;
+          v[t+dt] = v[t] + a[t] * dt;
+          cte[t+dt] = cte[t] + v[t] * sin(epsi[t]) * dt;
+          epsi[t+dt] = epsi[t]+ v[t] * delta[t] / Lf * dt;
+```
+
+The cost function we use is:
+
+```cpp
+    double ref_v = 120;
+    
+    // The cost is stored is the first element of `fg`.
+    // Any additions to the cost should be added to `fg[0]`.
+    fg[0] = 0;
+
+    // Reference State Cost
+    // TODO: Define the cost related the reference state and
+    // any anything you think may be beneficial.
+    for (size_t t = 0; t < N; t++) {
+      fg[0] += 4 * 2000 * CppAD::pow(vars[cte_start + t], 2);
+      fg[0] += 4 * 2000 * CppAD::pow(vars[epsi_start + t], 2);
+      fg[0] += CppAD::pow(vars[v_start + t] - ref_v, 2);
+    }
+
+    // Minimize the use of actuators.
+    for (size_t t = 0; t < N - 1; t++) {
+      fg[0] += 5 * CppAD::pow(vars[delta_start + t], 2);
+      fg[0] += 5 * CppAD::pow(vars[a_start + t], 2);
+    }
+
+    // smooth
+    for (size_t t = 0; t < N - 2; t++) {
+      fg[0] += 200 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+      fg[0] += 10 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+    }
+```
+
 
 ### Timestep Length and Elapsed Duration (N & dt)
 
@@ -13,12 +64,53 @@ N=10 and dt=100ms is used so that we are working on 1 second of data.
 
 ### Polynomial Fitting and MPC Preprocessing
 
-Coordinates are transformed into vehicule coordinate system.
+Waypoints populated by path planning module are transformed into vehicule coordinate system.   
+First we do -Translation(px, py) and then multiply [x, y] by the inverse of the Rotation matrix(psi) of the vehicule.    
+```cpp
+          // tranform to vehicule coordinates
+          for (size_t i = 0; i < ptsx.size(); i++) {
+            double x = ptsx[i] - px;
+            double y = ptsy[i] - py;
+
+            xvals[i] = x * cos(-psi) - y * sin(-psi);
+            yvals[i] = x * sin(-psi) + y * cos(-psi);
+          }
+```
 Then a 3rd order polynomial fit is used to approximate the planned trajectory. 
+```cpp
+ auto coeffs = polyfit(xvals, yvals, 3);
+```
+
+cte and epsi are then computed:
+
+```cpp
+          // calculate the cross track error
+          double cte = polyeval(coeffs, px) - py;
+          // calculate the orientation error
+          // double epsi = psi - atan( coeffs[1] + 2 * coeffs[2] * px + 3 * coeffs[3] * pow(x, 2) )
+          double epsi = psi - atan(coeffs[1]);
+          
+          AD<double> f0 = coeffs[0] + coeffs[1] * x0 + coeffs[2] * x0 * x0 + coeffs[3] * x0 * x0 * x0;
+          AD<double> psides0 = CppAD::atan(coeffs[1] + 2 * coeffs[2] * x0 + 3 * coeffs[3] * x0 * x0);
+```
 
 ### Model Predictive Control with Latency
 
-We are running a simulation using the vehicle model starting from the current state for the duration of the latency. The resulting state from the simulation is the new initial state for MPC.
+We are running a simulation using the vehicle model starting from the current state for the duration of the latency.   
+The resulting state from the simulation is the new initial state for MPC.  
+In our case, in the car coordiante system: px=0, py=0, psi=0.    
+delta (sterring_angle) and a (throttle) are the current value read at time t.  
+
+```cpp
+          // account for 100 ms latency
+          double dt = 0.1;
+          px += v * cos(psi) * dt;
+          py += v * sin(psi) * dt;
+          psi -= v * delta / Lf * dt;
+          v += a * dt;
+          cte += v * sin(epsi) * dt;
+          epsi -= v * delta / Lf * dt;
+```
 
 ---
 
