@@ -92,8 +92,8 @@ int main() {
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
 
-          // XXX double delta = j[1]["steering_angle"];
-          // XXX double a = j[1]["throttle"];
+          double delta = j[1]["steering_angle"];
+          double a = j[1]["throttle"];
 
           /*
           * TODO: Calculate steering angle and throttle using MPC.
@@ -123,19 +123,28 @@ int main() {
           px = 0;
           py = 0;
           psi = 0;
-          // XXX v *= 0.44704; // mph -> m/s
           // calculate the cross track error
           double cte = polyeval(coeffs, px) - py;
           // calculate the orientation error
           // double epsi = psi - atan( coeffs[1] + 2 * coeffs[2] * px + 3 * coeffs[3] * pow(x, 2) )
           double epsi = psi - atan(coeffs[1]);
 
+          double Lf = 2.67;
+
+          // account for 100 ms latency
+          double dt = 0.1;
+          px += v * cos(psi) * dt;
+          py += v * sin(psi) * dt;
+          psi -= v * delta / Lf * dt;
+          v += a * dt;
+          cte += v * sin(epsi) * dt;
+          epsi -= v * delta / Lf * dt;
+
           Eigen::VectorXd state(6);
           state << px, py, psi, v, cte, epsi;
 
           auto vars = mpc.Solve(state, coeffs);
 
-          double Lf = 2.67;
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
@@ -149,11 +158,9 @@ int main() {
 
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
-          for (int i = 2; i < vars.size(); i++) {
-            if (i % 2 == 0)
-              mpc_x_vals.push_back(vars[i]);
-            else
-              mpc_y_vals.push_back(vars[i]);
+          for (int i = 2; i < vars.size(); i+=2) {
+            mpc_x_vals.push_back(vars[i]);
+            mpc_y_vals.push_back(vars[i+1]);
           }
 
           msgJson["mpc_x"] = mpc_x_vals;
@@ -188,7 +195,7 @@ int main() {
           //
           // NOTE: REMEMBER TO SET THIS TO 100 MILLISECONDS BEFORE
           // SUBMITTING.
-          // XXX TODO this_thread::sleep_for(chrono::milliseconds(100));
+          this_thread::sleep_for(chrono::milliseconds(100));
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
       } else {

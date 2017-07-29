@@ -25,7 +25,7 @@ const double Lf = 2.67;
 // NOTE: feel free to play around with this
 // or do something completely different
 
-double ref_v = 130;
+double ref_v = 120;
 
 // The solver takes all the state variables and actuator
 // variables in a singular vector. Thus, we should to establish
@@ -60,8 +60,8 @@ class FG_eval {
     // TODO: Define the cost related the reference state and
     // any anything you think may be beneficial.
     for (size_t t = 0; t < N; t++) {
-      fg[0] += 2000 * CppAD::pow(vars[cte_start + t], 2);
-      fg[0] += 2000 * CppAD::pow(vars[epsi_start + t], 2);
+      fg[0] += 4 * 2000 * CppAD::pow(vars[cte_start + t], 2);
+      fg[0] += 4 * 2000 * CppAD::pow(vars[epsi_start + t], 2);
       fg[0] += CppAD::pow(vars[v_start + t] - ref_v, 2);
     }
 
