@@ -206,7 +206,14 @@ This should result in a trajectory that is close to our planned trajectory while
      <br>solver_actuate.png
 </p>
 
+### MPC Solver implementation
 
+ipopt and cppad are used to solve non-linear minimization problems.  
+ipopt requires the computation of first order (Jacobians) and 2nd order derivatives (Hessians).  
+These derivatives will be computed automatically thanks to cppad: providing automatic differentiation services.  
+  
+  A good tutorial example can be found at: https://www.coin-or.org/CppAD/Doc/ipopt_solve_get_started.cpp.htm  
+  
 ---
 
 ## Dependencies
