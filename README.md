@@ -118,7 +118,7 @@ This is a trade-off: we need enough data visibility to ensure a good prediction 
      <br>solver_setup.png
 </p>
 
-To summarize: we are solving a non-linear minimizatrion problem. Trying to minimize a defined cost function given a set of constraints (provided by the state equations and actuators constraints).  
+To summarize: we are solving a non-linear minimizatrion problem. Trying to minimize a defined cost function given a set of constraints (provided by the state equations and actuators constraints) over a discretized set of N time steps (one step every dt seconds).   
 
 ### Polynomial Fitting and MPC Preprocessing
 
