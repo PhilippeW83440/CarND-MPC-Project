@@ -133,12 +133,14 @@ int main() {
 
           // account for 100 ms latency
           double dt = 0.1;
-          px += v * cos(psi) * dt;
-          py += v * sin(psi) * dt;
+          //px += v * cos(psi) * dt;
+          //py += v * sin(psi) * dt;
+          px += v * cos(-delta) * dt;
+          py += v * sin(-delta) * dt;
           psi -= v * delta / Lf * dt;
-          v += a * dt;
           cte += v * sin(epsi) * dt;
           epsi -= v * delta / Lf * dt;
+          v += a * dt; // XXX: update v at the end
 
           Eigen::VectorXd state(6);
           state << px, py, psi, v, cte, epsi;
