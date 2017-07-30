@@ -47,10 +47,10 @@ The errors variables are the following:
      <br>errors.png
 </p>
 
-* cte: cross track error. 
-* epsi
+* cte: cross track error. It corresponds to distance of vehicule from the planned trajectory (as planned by path planning module)  
+* epsi: is the angle difference of the vehgicule trajectory with the planned trajectory (as planned by path planning module)  
 
-A simple kinematic model is used.
+A simple kinematic model is used. Kinematic models are simplifications of dynamic models that ignore tire forces, gravity, and mass. This simplification reduces the accuracy of the models, but it also makes them more tractable. At low and moderate speeds, kinematic models often approximate the actual vehicle dynamics.  
 
 ```cpp
           px[t+dt] = px[t] + v[t] * cos(psi[t]) * dt;
