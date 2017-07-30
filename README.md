@@ -19,28 +19,35 @@ Self-Driving Car Engineer Nanodegree Program
      <br>pipeline.png
 </p>
 
+This project deals with the last stage of an autonomous driving pipeline: the control module.  
+The input to the control module will be provided by the output of the path planning module via a set of waypoints to follow as close as possible.  
+The control module will have to provide the actuators commands (in our case steering angle and throttling; acceleration or deceleration) so that the automated driving comply to a set of rules:  
+* follow the planned waypoints as close as possible
+* drives smoothly
+* try to adjust the speed: as fast as a configurable reference when possible and driving more slowly during curves  
+
 ### Model
 
-State variables:
+The state variables are the following:
 
 <p align="center">
      <img src="./MPC_images/state.png" alt="state" width="40%" height="40%">
      <br>stae.png
 </p>
 
-* px
-* py
-* psi
-* v
+* px: x position
+* py: y position
+* psi: angle between speed vector and x-axis
+* v: speed vector magnitude
 
-Errors:
+The errors variables are the following:
 
 <p align="center">
      <img src="./MPC_images/errors.png" alt="errors" width="50%" height="50%">
      <br>errors.png
 </p>
 
-* cte
+* cte: cross track error. 
 * epsi
 
 A simple kinematic model is used.
