@@ -50,6 +50,8 @@ The errors variables are the following:
 * cte: cross track error. It corresponds to distance of vehicule from the planned trajectory (as planned by path planning module)  
 * epsi: is the angle difference of the vehgicule trajectory with the planned trajectory (as planned by path planning module)  
 
+The new state is [x, y, ψ, v, cte, eψ].  
+
 A simple kinematic model is used. Kinematic models are simplifications of dynamic models that ignore tire forces, gravity, and mass. This simplification reduces the accuracy of the models, but it also makes them more tractable. At low and moderate speeds, kinematic models often approximate the actual vehicle dynamics.  
 
 ```cpp
@@ -61,7 +63,15 @@ A simple kinematic model is used. Kinematic models are simplifications of dynami
           epsi[t+dt] = epsi[t]+ v[t] * delta[t] / Lf * dt;
 ```
 
-The cost function we use is:
+The cost function we use accounts for different goals:  
+* minimize cte error  
+* minimize epsi error  
+* try to reach a target speed (ref_v)  
+* minimize the use of actuators  
+* ensure a smooth drive  
+
+In the below cost function we are setting a very big weight to cte and epsi error minimization.  
+As a consequence, while driving, we can see that the driving is safe: the vehicule slows down during the curves and then accelerates mainly when the road is straight. So we can reach high speed at some point but drive safely in the curves.  
 
 ```cpp
     double ref_v = 120;
@@ -99,13 +109,16 @@ The cost function we use is:
 
 ### Timestep Length and Elapsed Duration (N & dt)
 
-N=10 and dt=100ms is used so that we are working on 1 second of data.
+N=10 and dt=100ms is used so that we are working on 1 second of data.  
+This is a trade-off: we need enough data visibility to ensure a good prediction but we also have to limit the amount of computation.  
 
 
 <p align="center">
      <img src="./MPC_images/solver_setup.png" alt="solver_setup" width="50%" height="50%">
      <br>solver_setup.png
 </p>
+
+To summarize: we are solving a non-linear minimizatrion problem. Trying to minimize a defined cost function given a set of constraints (provided by the state equations and actuators constraints).  
 
 ### Polynomial Fitting and MPC Preprocessing
 
@@ -126,7 +139,14 @@ Then a 3rd order polynomial fit is used to approximate the planned trajectory.
  auto coeffs = polyfit(xvals, yvals, 3);
 ```
 
-cte and epsi are then computed:
+The state vector for the vehicule in vehicule coordiante system is:  
+* px = 0  
+* py = 0  
+* psi = 0  
+
+cte and epsi are then computed as:  
+* cte is the differnece between the 3rd order polynomial evaluated at x (planned y position i.e. f(x)) - y (real y position)  
+* epsi is the difference between the 3rd order polynomial slope evaluated at x (i.e. artcan(f'(x)) - psi (real slope)  
 
 ```cpp
           // calculate the cross track error
@@ -160,15 +180,26 @@ delta (sterring_angle) and a (throttle) are the current value read at time t.
 ### MPC Solver
 
 
+To summarize: we are solving a non-linear minimization problem.  
+Minimizing a defined cost function given a set of constraints (provided by the state equations and actuators constraints).  
+
+The input of our solver/minimizer is the current state vector:  
+
 <p align="center">
      <img src="./MPC_images/solver_in.png" alt="solver_in" width="50%" height="50%">
      <br>solver_in.png
 </p>
 
+
+The output of our solver/minimizer is a set of actuator commands to apply:   
+
 <p align="center">
      <img src="./MPC_images/solver_out.png" alt="solver_out" width="50%" height="50%">
      <br>solver_out.png
 </p>
+
+
+This should result in a trajectory that is close to our planned trajectory while also ensuring smoth and safe driving:  
 
 <p align="center">
      <img src="./MPC_images/solver_actuate.png" alt="solver_actuate" width="40%" height="40%">
