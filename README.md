@@ -1,17 +1,36 @@
 # CarND-Controls-MPC
 Self-Driving Car Engineer Nanodegree Program
 
+[//]: # (Image References)
+[image1]: ./MPC_images/pipeline.png
+[image2]: ./MPC_images/state.png
+[image3]: ./MPC_images/errors.png
+[image4]: ./MPC_images/minimization.png
+[image5]: ./MPC_images/solver_setup.png
+[image6]: ./MPC_images/solver_in.png
+[image7]: ./MPC_images/solver_out.png
+[image8]: ./MPC_images/solver_actuate.png
+[image9]: ./MPC_imagestest5_result.png
+
 ## Description
+
+![alt text][image1]
 
 ### Model
 
 State variables:
+
+![alt text][image2]
+
 * px
 * py
 * psi
 * v
 
 Errors:
+
+![alt text][image3]
+
 * cte
 * epsi
 
@@ -57,10 +76,13 @@ The cost function we use is:
     }
 ```
 
+![alt text][image4]
 
 ### Timestep Length and Elapsed Duration (N & dt)
 
 N=10 and dt=100ms is used so that we are working on 1 second of data.
+
+![alt text][image5]
 
 ### Polynomial Fitting and MPC Preprocessing
 
@@ -111,6 +133,12 @@ delta (sterring_angle) and a (throttle) are the current value read at time t.
           cte += v * sin(epsi) * dt;
           epsi -= v * delta / Lf * dt;
 ```
+
+### MPC Solver
+
+![alt text][image6]
+![alt text][image7]
+![alt text][image8]
 
 ---
 
