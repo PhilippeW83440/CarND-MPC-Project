@@ -14,13 +14,19 @@ Self-Driving Car Engineer Nanodegree Program
 
 ## Description
 
-![alt text][image1]
+<p align="center">
+     <img src="./MPC_images/pipeline.png" alt="pipeline" width="50%" height="50%">
+     <br>pipeline.png
+</p>
 
 ### Model
 
 State variables:
 
-![alt text][image2]
+<p align="center">
+     <img src="./MPC_images/state.png" alt="state" width="40%" height="40%">
+     <br>stae.png
+</p>
 
 * px
 * py
@@ -29,7 +35,10 @@ State variables:
 
 Errors:
 
-![alt text][image3]
+<p align="center">
+     <img src="./MPC_images/errors.png" alt="errors" width="50%" height="50%">
+     <br>errors.png
+</p>
 
 * cte
 * epsi
@@ -76,13 +85,20 @@ The cost function we use is:
     }
 ```
 
-![alt text][image4]
+<p align="center">
+     <img src="./MPC_images/minimization.png" alt="minimization" width="50%" height="50%">
+     <br>minimization.png
+</p>
 
 ### Timestep Length and Elapsed Duration (N & dt)
 
 N=10 and dt=100ms is used so that we are working on 1 second of data.
 
-![alt text][image5]
+
+<p align="center">
+     <img src="./MPC_images/solver_setup.png" alt="solver_setup" width="50%" height="50%">
+     <br>solver_setup.png
+</p>
 
 ### Polynomial Fitting and MPC Preprocessing
 
@@ -136,9 +152,22 @@ delta (sterring_angle) and a (throttle) are the current value read at time t.
 
 ### MPC Solver
 
-![alt text][image6]
-![alt text][image7]
-![alt text][image8]
+
+<p align="center">
+     <img src="./MPC_images/solver_in.png" alt="solver_in" width="50%" height="50%">
+     <br>solver_in.png
+</p>
+
+<p align="center">
+     <img src="./MPC_images/solver_out.png" alt="solver_out" width="50%" height="50%">
+     <br>solver_out.png
+</p>
+
+<p align="center">
+     <img src="./MPC_images/solver_actuate.png" alt="solver_actuate" width="40%" height="40%">
+     <br>solver_actuate.png
+</p>
+
 
 ---
 
