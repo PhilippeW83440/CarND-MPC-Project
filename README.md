@@ -111,6 +111,8 @@ As a consequence, while driving, we can see that the driving is safe: the vehicu
 
 N=10 and dt=100ms is used so that we are working on 1 second of data.  
 This is a trade-off: we need enough data visibility to ensure a good prediction but we also have to limit the amount of computation.  
+In general, smaller dt gives better accuracy but that will require higher N for given horizon (N*dt). However, increase N will result in longer computational time which effectively increase the latency. The most common choice of values are N=10 and dt=0.1 but anything between N=20, dt=0.05 should work.  
+
 
 
 <p align="center">
