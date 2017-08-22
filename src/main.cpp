@@ -133,10 +133,14 @@ int main() {
 
           // account for 100 ms latency
           double dt = 0.1;
-          //px += v * cos(psi) * dt;
-          //py += v * sin(psi) * dt;
-          px += v * cos(-delta) * dt;
-          py += v * sin(-delta) * dt;
+          px += v * cos(psi) * dt;
+          py += v * sin(psi) * dt;
+
+          // this was suggested by project reviewer
+          // but it was breaking things during the sharp corner
+          //px += v * cos(-delta) * dt;
+          //py += v * sin(-delta) * dt;
+
           psi -= v * delta / Lf * dt;
           cte += v * sin(epsi) * dt;
           epsi -= v * delta / Lf * dt;
