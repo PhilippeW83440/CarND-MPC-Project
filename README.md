@@ -21,7 +21,7 @@ Self-Driving Car Engineer Nanodegree Program
 
 This project deals with the last stage of an autonomous driving pipeline: the control module.  
 The input to the control module will be provided by the output of the path planning module via a set of waypoints to follow as close as possible.  
-The control module will have to provide the actuators commands (in our case steering angle and throttling; acceleration or deceleration) so that the automated driving comply to a set of rules:  
+The control module will have to provide the actuators commands (in our case steering angle and throttling; acceleration or deceleration) so that the automated driving comply with a set of rules:  
 * follow the planned waypoints as close as possible
 * drives smoothly
 * try to adjust the speed: as fast as a configurable reference when possible and driving more slowly during curves  
@@ -47,8 +47,8 @@ The errors variables are the following:
      <br>errors.png
 </p>
 
-* cte: cross track error. It corresponds to distance of vehicule from the planned trajectory (as planned by path planning module)  
-* epsi: is the angle difference of the vehgicule trajectory with the planned trajectory (as planned by path planning module)  
+* cte: cross track error. It corresponds to distance of vehicle from the planned trajectory (as planned by path planning module)  
+* epsi: is the angle difference of the vehicle trajectory with the planned trajectory (as planned by path planning module)  
 
 The new state is [x, y, ψ, v, cte, eψ].  
 
@@ -70,8 +70,8 @@ The cost function we use accounts for different goals:
 * minimize the use of actuators  
 * ensure a smooth drive  
 
-In the below cost function we are setting a very big weight to cte and epsi error minimization.  
-As a consequence, while driving, we can see that the driving is safe: the vehicule slows down during the curves and then accelerates mainly when the road is straight. So we can reach high speed at some point but drive safely in the curves.  
+In the below cost function we are setting a very big weight for cte and epsi error minimization.  
+As a consequence, while driving, we can see that the driving is safe: the vehicle slows down during the curves and then accelerates mainly when the road is straight. So we can reach a high speed at some point but drive safely in the curves.  
 
 ```cpp
     double ref_v = 120;
@@ -109,9 +109,9 @@ As a consequence, while driving, we can see that the driving is safe: the vehicu
 
 ### Timestep Length and Elapsed Duration (N & dt)
 
-N=10 and dt=100ms is used so that we are working on 1 second of data.  
-This is a trade-off: we need enough data visibility to ensure a good prediction but we also have to limit the amount of computation.  
-In general, smaller dt gives better accuracy but that will require higher N for given horizon (N*dt). However, increase N will result in longer computational time which effectively increase the latency. The most common choice of values are N=10 and dt=0.1 but anything between N=20, dt=0.05 should work.  
+N=10 and dt=100ms are used so that we are working on 1 second of data.  
+This is a trade-off: we need enough data visibility to ensure a good prediction, but we also have to limit the amount of computation.  
+In general, smaller dt gives better accuracy, but that will require higher N for given horizon (N*dt). However, increasing N will result in longer computational time which increases the latency. The most common choice of values is N=10 and dt=0.1 but anything between N=20, dt=0.05 should work.  
 
 
 
@@ -120,12 +120,12 @@ In general, smaller dt gives better accuracy but that will require higher N for 
      <br>solver_setup.png
 </p>
 
-To summarize: we are solving a non-linear minimizatrion problem. Trying to minimize a defined cost function given a set of constraints (provided by the state equations and actuators constraints) over a discretized set of N time steps (one step every dt seconds).   
+To summarize: we are solving a non-linear minimization problem. Trying to minimize a defined cost function given a set of constraints (provided by the state equations and actuators constraints) over a discretized set of N time steps (one step every dt seconds).   
 
 ### Polynomial Fitting and MPC Preprocessing
 
-Waypoints populated by path planning module are transformed into vehicule coordinate system.   
-First we do -Translation(px, py) and then multiply [x, y] by the inverse of the Rotation matrix(psi) of the vehicule.    
+Waypoints populated by the path planning module are transformed into the vehicle coordinate system.   
+First, we do -Translation(px, py) and then multiply [x, y] by the inverse of the Rotation matrix(psi) of the vehicle.    
 ```cpp
           // tranform to vehicule coordinates
           for (size_t i = 0; i < ptsx.size(); i++) {
@@ -141,13 +141,13 @@ Then a 3rd order polynomial fit is used to approximate the planned trajectory.
  auto coeffs = polyfit(xvals, yvals, 3);
 ```
 
-The state vector for the vehicule in vehicule coordiante system is:  
+The state vector for the vehicle in vehicle coordinate system is:  
 * px = 0  
 * py = 0  
 * psi = 0  
 
 cte and epsi are then computed as:  
-* cte is the differnece between the 3rd order polynomial evaluated at x (planned y position i.e. f(x)) - y (real y position)  
+* cte is the difference between the 3rd order polynomial evaluated at x (planned y position i.e. f(x)) - y (real y position)  
 * epsi is the difference between the 3rd order polynomial slope evaluated at x (i.e. artcan(f'(x)) - psi (real slope)  
 
 ```cpp
@@ -165,7 +165,7 @@ cte and epsi are then computed as:
 
 We are running a simulation using the vehicle model starting from the current state for the duration of the latency.   
 The resulting state from the simulation is the new initial state for MPC.  
-In our case, in the car coordiante system: px=0, py=0, psi=0.    
+In our case, in the car coordinate system: px=0, py=0, psi=0.    
 delta (sterring_angle) and a (throttle) are the current value read at time t.  
 
 ```cpp
@@ -182,8 +182,8 @@ delta (sterring_angle) and a (throttle) are the current value read at time t.
 ### MPC Solver
 
 
-To summarize: we are solving a non-linear minimization problem.  
-Minimizing a defined cost function given a set of constraints (provided by the state equations and actuators constraints).  
+To summarize: we are solving a non-linear minimization problem, 
+minimizing a defined cost function given a set of constraints (provided by the state equations and actuators constraints).  
 
 The input of our solver/minimizer is the current state vector:  
 
@@ -201,7 +201,7 @@ The output of our solver/minimizer is a set of actuator commands to apply:
 </p>
 
 
-This should result in a trajectory that is close to our planned trajectory while also ensuring smoth and safe driving:  
+This should result in a trajectory that is close to our planned trajectory while also ensuring smooth and safe driving:  
 
 <p align="center">
      <img src="./MPC_images/solver_actuate.png" alt="solver_actuate" width="40%" height="40%">
@@ -214,7 +214,7 @@ ipopt and cppad are used to solve non-linear minimization problems.
 ipopt requires the computation of first order (Jacobians) and 2nd order derivatives (Hessians).  
 These derivatives will be computed automatically thanks to cppad: providing automatic differentiation services.  
   
-  A good tutorial example can be found at: https://www.coin-or.org/CppAD/Doc/ipopt_solve_get_started.cpp.htm  
+  A good tutorial example can be found at https://www.coin-or.org/CppAD/Doc/ipopt_solve_get_started.cpp.htm  
   
 ---
 
