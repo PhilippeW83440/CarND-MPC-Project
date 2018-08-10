@@ -1,0 +1,86 @@
+\documentclass[11pt]{article}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{xcolor}
+
+\begin{document}
+
+\title{Model Predictive Control notes}
+\author{Philippe Weingertner}
+\date{\today}
+\maketitle
+
+\section{Motion Planning problem}
+
+Formulation of the problem.
+
+\section{PID control recap}
+
+\subsection{Proportional Control}
+
+\subsection{Oscillations and PD Controller}
+
+\subsection{Systematic Bias and PID Controller}
+
+\subsection{Twiddle and parameter optimization}
+
+\section{Vehicle Models}
+
+\subsection{Dynamic vs Kinematic Models}
+
+\subsection{Kinematic Model}
+
+\subsubsection{State}
+
+\subsubsection{Global Kinematic Model}
+
+\subsubsection{Following Trajectories}
+
+\subsubsection{Fitting Polynomials}
+
+\subsubsection{Errors}
+
+\subsection{Dynamic Models}
+
+
+Forces, Slip Angle, Slip ratio and Tire Models
+
+
+\subsection{Actuator Constraints}
+
+\section{Model Predictive Control}
+
+MPC reframes the task of following a trajectory as an optimization problem. The solution to the optimization problem is the optimal trajectory. \\
+
+MPC involves simulating different actuator inputs, predicting the resulting trajectory and minimizing a set of constraints (or cost functions). \\ 
+
+\textbf{Input:} a reference trajectory we want to follow \\ \\
+\textbf{Constraints:}
+\begin{itemize}
+\item Vehicle Model
+\item Comfort
+\end{itemize}
+
+\textbf{Output:} actuator commands (steering, throttling, braking ...)  \\ \\
+
+Once we found the lowest cost trajectory, we implement the very first set of actuation commands. Then we throw away the rest of the trajectory we calculated. Instead of using the old trajectory we predicted, we take our new state and use that to calculate a new optimal trajectory. In that sense, we are constantly calculating inputs over a future horizon. That's why this approach is also called Receding Horizon Control. We constantly reevaluate the trajectory because our vehicle model is not perfect and the next predicted (or planned) state may (slightly...) differ with our prediction (in the sense of a consequence of a command sent).  
+
+\subsection{Optimization under constraints}
+
+\subsection{Defining cost functions}
+\subsection{Length and duration}
+\subsection{MPC Solver algorithm}
+
+\subsection{Latency handling}
+
+A contributing factor to latency is actuator dynamics. For example the time elapsed between when you command a steering angle to when that angle is actually achieved. This could easily be modeled by a simple dynamic system and incorporated into the vehicle model. One approach would be running a simulation using the vehicle model starting from the current state for the duration of the latency. The resulting state from the simulation is the new initial state for MPC.
+
+Thus, MPC can deal with latency much more effectively, by explicitly taking it into account, than a PID controller.
+
+\subsection{MPC Solver implementation with ipopt and cppAD}
+
+
+
+
+\end{document}}
