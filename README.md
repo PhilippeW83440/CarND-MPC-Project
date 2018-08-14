@@ -215,7 +215,12 @@ ipopt requires the computation of first order (Jacobians) and 2nd order derivati
 These derivatives will be computed automatically thanks to cppad: providing automatic differentiation services.  
   
   A good tutorial example can be found at https://www.coin-or.org/CppAD/Doc/ipopt_solve_get_started.cpp.htm  
-  
+
+
+### MPC Solver simpler implementation
+
+https://discussions.udacity.com/t/simplyfied-state-in-mpc/382849/2   
+
 ---
 
 ## Dependencies
