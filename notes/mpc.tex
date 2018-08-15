@@ -10,6 +10,8 @@
 
 \usepackage{listings}
 
+\usepackage{empheq}
+
 % set the default code style
 \lstset{
     frame=tb, % draw a frame at the top and bottom of the code block
@@ -237,31 +239,63 @@ Our state vector is $$ S_t = [x_t, y_t, \psi_t, v_t] $$
 
 We derive an approximation model, kinematic, relating $S_{t+1}$ and $S_t$. The smaller the $dt$ the more accurate the model. \\
 
+The model used id the kinematic bicycle model:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth]{bicycle_model}
+    \caption{Kinematic bicycle model}
+    \label{fig:bicycle_model}
+\end{figure}
+\FloatBarrier
+
+
 \textbf{Linear movement approximation}: assuming during $dt$ that $v_t$ and $\psi_t$ are constant:
 $$ x_{t+1} = x_t + v_t * \cos(\psi_t) *  dt $$
 $$ y_{t+1} = y_t + v_t * \sin(\psi_t) *  dt $$
 
-\textbf{Rotational movement approximation}: assuming during $dt$ that $v_t$ and steering angle $\delta_t$ are constant:
+\textbf{Rotational movement approximation}: assuming during $dt$ that $v_t$ and steering angle $\delta_t$ are constant: \\
 
-$$ {M_{t+1}M_{t}} = \rho * (\psi_{t+1} - \psi_t) = v_t * dt$$
-$$ \tan(\delta_t) = L_f / \rho $$
+Let first compute the radius of curvature $R$ based on the steering angle $\delta$ and the distance $L$ between rear and front wheels:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth]{radius_curvature}
+    \caption{Radius of curvature R}
+    \label{fig:radius_curvature}
+\end{figure}
+\FloatBarrier
+
+We have $$ \tan(\delta) \approx L /R $$
+
+We are moving on a circle from position $M_t$ to position $M_{t+1}$ at a constant speed $v_t$
+$$ {M_{t+1}M_{t}} = R * (\psi_{t+1} - \psi_t) \approx v_t * dt$$ 
 So we have:
-$$ \psi_{t+1} = \psi_t + (v_t /\rho) * dt$$
-$$ \psi_{t+1} = \psi_t + (v_t / L_f) * \tan(\delta_t) * dt $$
+
+\begin{align*} 
+\psi_{t+1} &= \psi_t + (v_t / R) * dt \\
+\psi_{t+1} &= \psi_t + (v_t / L) * \tan(\delta_t) * dt
+\end{align*} 
+
 \textit{Note that for small $\delta_t$ we have $\tan(\delta_t) \approx \delta_t$} \\
 
 \textbf{Speed update}: assuming during $dt$ that $a_t$ is constant:
 $$ v_{t+1} = v_t + a_t * dt $$ \\
 
-So to summarize our kinematic model is:
+So to summarize our kinematic bicycle model is:
 
-$$ x_{t+1} = x_t + v_t * \cos(\psi_t) *  dt $$
-$$ y_{t+1} = y_t + v_t * \sin(\psi_t) *  dt $$
-$$ \psi_{t+1} = \psi_t + (v_t / L_f) * \tan(\delta_t) * dt $$
-$$ v_{t+1} = v_t + a_t * dt $$
+\begin{empheq}[box=\fbox]{align*}
+x_{t+1} &= x_t + v_t * \cos(\psi_t) *  dt \\
+y_{t+1} &= y_t + v_t * \sin(\psi_t) *  dt \\
+\psi_{t+1} &= \psi_t + (v_t / L) * \tan(\delta_t) * dt \\
+v_{t+1} &= v_t + a_t * dt
+\end{empheq} \\
+
 
 The state vector is $ S_t = [x_t, y_t, \psi_t, v_t] $. \\
-The actuator command $ A_t = [ a_t, \delta_t ] $ defines a \textbf{constraint} between $S_{t+1}$ and $ S_t $.
+The actuator command $ A_t = [ a_t, \delta_t ] $ defines a \textbf{constraint} between $S_{t+1}$ and $ S_t $. \\
+
+Note also that for a bicycle we have $\delta_t  \in [-\pi / 2, \pi / 2]$ whereas for a car we have $\delta_t  \in (-\delta_{max}, \delta_{max})$ with $\delta_{max} < \pi / 2$.
 
 
 \subsubsection{Errors}
