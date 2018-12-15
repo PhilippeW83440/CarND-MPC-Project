@@ -244,11 +244,51 @@ y - y_t
 
 Let's assume the reference trajectory provided by the Path Planning module is a set of waypoints approximated or fitted by a (3rd order typically) polynomial $f(x_t)= a_0 + a_1 x_t + a_2 x_t^2 + a_3 x_t^3$ and our real position on the y-axis is $y_t$ \\
 
-TODO: pseudo inverse, QR decomposition, sample C++ code
+How can we frame the problem ? \\
+Our unknown vector corresponds to the unknown polynomial coefficients
+$$X=[a_0, a_1, a_2, a_3]^T$$
+Now let's assume we have 5 samples
+$$A=
+\begin{bmatrix}
+1 & x_t^{(1)} &  {x_t^2}^{(1)} &  {x_t^3}^{(1)} \\ 
+1 & x_t^{(2)} &  {x_t^2}^{(2)} &  {x_t^3}^{(2)} \\
+1 & x_t^{(3)} &  {x_t^2}^{(3)} &  {x_t^3}^{(3)} \\
+1 & x_t^{(4)} &  {x_t^2}^{(4)} &  {x_t^3}^{(4)} \\
+1 & x_t^{(5)} &  {x_t^2}^{(5)} &  {x_t^3}^{(5)} \\
+\end{bmatrix}$$
+
+$$B=
+\begin{bmatrix}
+f(x_t^{(1)}) \\ 
+f(x_t^{(2)}) \\
+f(x_t^{(3)}) \\
+f(x_t^{(4)}) \\
+f(x_t^{(5)}) \\
+\end{bmatrix}$$
+
+We have:
+$$ AX=B $$
+
+$A$ is not squarred, solve this problem with e.g. the pseudo-inverse. \\
+
+Pseudo inverse quick recap:
+$$AX=B \textit{ with A a non squarred matrix}$$
+$$A^T AX=A^TB \textit{ with }A^TA \textit{ squarred}$$
+So we may inverse it now if $A^TA$ is not degenerated (use samples that are  different so that $A^TA$ is not degenerated)
+
+$$X=(A^TA)^{-1}A^TB$$
+
+The pseudo-inverse of $A$ a non squarred matrix is
+$$ A^\dagger = (A^TA)^{-1}A^T$$
 
 \subsection{Compute the tangential angle of a polynomial curve}
 
 \url{https://en.wikipedia.org/wiki/Tangential_angle}
+
+If the curve is given by $y = f(x)$, then we may take $(x, f(x))$ as the parametrization, and we may assume the tangential angle $\psi$ is between $−\pi/2$ and $\pi/2$. This produces the explicit expression:
+
+$$ \psi = arctan(f'(x))$$ 
+
 
 \section{Vehicle Models}
 
@@ -297,7 +337,7 @@ The model used id the kinematic bicycle model:
 $$ x_{t+1} = x_t + v_t * \cos(\psi_t) *  dt $$
 $$ y_{t+1} = y_t + v_t * \sin(\psi_t) *  dt $$
 
-\textbf{Rotational movement approximation}: assuming during $dt$ that $v_t$ and steering angle $\delta_t$ are constant: \\
+\textbf{Rotational movement approximation}: assuming during $dt$ that $v_t$ and steering angle $\delta_t$ are constant we are creating a change from a starting $\psi_t$ to end up with $\psi_{t+1}$: \\
 
 Let first compute the radius of curvature $R$ based on the steering angle $\delta$ and the distance $L$ between rear and front wheels:
 
@@ -309,11 +349,17 @@ Let first compute the radius of curvature $R$ based on the steering angle $\delt
 \end{figure}
 \FloatBarrier
 
-We have $$ \tan(\delta) \approx L /R $$
 
 We are moving on a circle from position $M_t$ to position $M_{t+1}$ at a constant speed $v_t$
 $$ {M_{t+1}M_{t}} = R * (\psi_{t+1} - \psi_t) \approx v_t * dt$$ 
-So we have:
+
+We have 
+$$ \tan(\delta) \approx L /R $$
+
+Check that the 2 $\delta$ drawn are indeed the same. In the triangle we have $\pi/2 + \delta_{circle} + \alpha = \pi$ and along the line from the center of the circle of radius $R$ going through the center of the front wheel we have $ \pi/2 + \delta + \alpha = \pi$. So we have:
+$$ \delta_{circle} = \delta $$
+
+And then:
 
 \begin{align*} 
 \psi_{t+1} &= \psi_t + (v_t / R) * dt \\
@@ -381,6 +427,17 @@ $ cte_{t+1} = cte_t + v_t * sin(e\Psi_t) * dt $ \\
 The update rule for $e\Psi_t$ is the same as for $\psi_t$: \\ 
 $ e\Psi_{t+1} = e\Psi_t + (v_t / L) * \tan(\delta_t) * dt $ \\
 
+As we have:
+$$ \psi_{t+1} = \psi_t + (v_t / L) * \tan(\delta_t) * dt $$
+$$ e\Psi_t = \psi_t - \arctan(f^{'}(x_t)) $$
+$$ e\Psi_{t+1} = \psi_{t+1} - \arctan(f^{'}(x_{t+1})) $$
+We get:
+$$ e\Psi_{t+1} = \psi_t + (v_t / L) * \tan(\delta_t) * dt - \arctan(f^{'}(x_{t+1})) $$
+$$ e\Psi_{t+1} = \psi_t - \arctan(f^{'}(x_{t+1})) + (v_t / L) * \tan(\delta_t) * dt  $$
+And assuming our tangential angle remains constant during $dt$ our orientation error will evolve such that:
+$$ e\Psi_{t+1} = \psi_t - \arctan(f^{'}(x_t)) + (v_t / L) * \tan(\delta_t) * dt  $$
+$$ e\Psi_{t+1} = e\Psi_t + (v_t / L) * \tan(\delta_t) * dt  $$
+
 
 So to summarize our kinematic bicycle error model which is a \textbf{kinematic error model constraint} is:
 
@@ -388,6 +445,8 @@ So to summarize our kinematic bicycle error model which is a \textbf{kinematic e
 cte_{t+1} &= cte_t + + v_t * sin(e\Psi_t) * dt \\
 e\Psi_{t+1} &= e\Psi_t + (v_t / L) * \tan(\delta_t) * dt
 \end{empheq}
+
+The underlying model is an approximation. Better models exist and are used in practice. Also the smaller the $dt$ considered, the better the approximation. But in any cases no models are perfect (they are just usefull) and there will anyways be a delta (the smaller the better) between where we predict the vehicle will go and where we will end up. As an extreme case consider we are driving over some ice or oil that was not modelled. So the model will be reactive and corrective. Commands for the actuators will be reevaluated at every timestep even if we do predictions and plan actuator commands over multiple timesteps.
 
 \subsubsection{Actuator Constraints}
 
