@@ -1,3 +1,20 @@
+# Additional resources
+
+MPC:  
+https://sites.google.com/site/mpclaboratory/mpc-course-material  
+https://cvxgen.com/docs/mpc.html  
+  
+MPC with Julia:
+https://github.com/JuliaMPC  
+https://github.com/MPC-Berkeley  
+  
+Optimization:  
+https://web.stanford.edu/group/sisl/k12/optimization/#!index.md  
+http://faculty.cas.usf.edu/jkwilde/mathcamp/math_camp.htm  
+https://github.com/sisl/aa222-notebook    
+
+
+  
 # CarND-Controls-MPC
 Self-Driving Car Engineer Nanodegree Program
 
