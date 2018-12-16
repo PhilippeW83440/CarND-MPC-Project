@@ -1,0 +1,458 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage{algorithm,algpseudocode}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement H
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine biblatex
+\cite_engine_type numerical
+\biblio_style plain
+\biblatex_bibstyle numeric
+\biblatex_citestyle numeric
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+MPC cheatsheet
+\end_layout
+
+\begin_layout Section
+Model Predictive Control
+\end_layout
+
+\begin_layout Subsection
+MPC setup
+\end_layout
+
+\begin_layout Standard
+We deal with a 
+\series bold
+discrete
+\series default
+ or discretized problem considered over a 
+\series bold
+
+\begin_inset Formula $\mathbf{N}$
+\end_inset
+
+ steps horizon
+\series default
+.
+ Every step has a 
+\begin_inset Formula $dt$
+\end_inset
+
+ duration.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\underset{u_{t},u_{t+1},\ldots,u_{t+N-1}}{min}\sum_{k=t}^{t+N-1}l(x_{k},u_{k})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\text{subj. to }\begin{cases}
+x_{k+1}=f(x_{k},u_{k}) & k=t,\ldots,t+N-1\\
+u_{k}\in\mathcal{U} & k=t,\ldots,t+N-1\\
+x_{k}\in\mathcal{X} & k=t,\ldots,t+N-1\\
+x_{t}=x(t) & k=t,\ldots,t+N-1
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+With:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $u$
+\end_inset
+
+ a control command e.g.
+ 
+\begin_inset Formula $u_{k}=[a_{x},a_{y}]^{T}$
+\end_inset
+
+ at time step 
+\begin_inset Formula $k$
+\end_inset
+
+ or 
+\begin_inset Formula $u_{k}=[a_{k},\delta_{k}]^{T}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $x_{k}$
+\end_inset
+
+ a state vector e.g.
+ 
+\begin_inset Formula $\mathbf{\mathbf{x}}_{k}=[x_{k},y_{k},x'_{k},y'_{k}]^{T}$
+\end_inset
+
+ or 
+\begin_inset Formula $x_{k}=[x,y,\theta,v]^{T}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $x_{k+1}=f(x_{k},u_{k})$
+\end_inset
+
+ usually corresponds to our vehicle dynamics model e.g.
+ 
+\begin_inset Formula $x_{k+1}=\begin{bmatrix}1 & 0 & dt & 0\\
+0 & 1 & 0 & dt\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1
+\end{bmatrix}x_{k}+\begin{bmatrix}\frac{dt^{2}}{2} & 0\\
+0 & \frac{dt^{2}}{2}
+\end{bmatrix}u_{k}=Ax_{k}+Bu_{k}=f(x_{k},u_{k})$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+l is a cost function we want to optimize: examples include jerk (to optimize
+ comfort), difference with a planned trajectory, time to goal or a combination
+ of objectives
+\end_layout
+
+\begin_layout Standard
+We are solving 
+\begin_inset Formula $\underset{u_{t:t+N-1}}{min}\sum_{k=t}^{t+N-1}l(x_{k},u_{k})$
+\end_inset
+
+ and not 
+\begin_inset Formula $\underset{u_{[t:t+N-1]}}{min}\int_{t}^{t+N}l(x(\tau),u(\tau)d\tau$
+\end_inset
+
+ !!! Soon or later you need to discretize anyways
+\end_layout
+
+\begin_layout Standard
+The algorithm will run at every time steps:
+\end_layout
+
+\begin_layout Itemize
+At time t:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Measure (or estimate) the current state
+\end_layout
+
+\begin_layout Itemize
+Find the optimal input sequence 
+\begin_inset Formula $U^{*}=\{u_{t}^{*},u_{t+1}^{*},u_{t+2}^{*},\ldots,u_{t+N-1}^{*}\}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+Apply only 
+\begin_inset Formula $u(t)=u_{t}^{*}$
+\end_inset
+
+ and discard 
+\begin_inset Formula $u_{t+1}^{*},u_{t+2}^{*},\ldots,u_{t+N-1}^{*}$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Repeat the same procedure at time 
+\begin_inset Formula $t+1$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Even assuming perfect model and no disturbances: the predicted open-loop
+ trajectories are DIFFERENT than the closed-loop trajectories
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+This algorithm has the following characteristics: multivariate, model based,
+ nonlinear, constraints based, predictive.
+ At each sampling time, starting at the current state, an open-loop optimal
+ control problem is solved over a finite horizon
+\end_layout
+
+\begin_layout Subsection
+MPC requirements
+\end_layout
+
+\begin_layout Standard
+In order to solve a MPC problem we need:
+\end_layout
+
+\begin_layout Itemize
+A discrete-time model of the system
+\end_layout
+
+\begin_layout Itemize
+A state observer
+\end_layout
+
+\begin_layout Itemize
+To setup an Optimization Problem
+\end_layout
+
+\begin_layout Itemize
+To solve an Optimization Problem (Matlab Optimization toolbox, NPSOL, cvxgen,
+ C++ Ipopt/CppAd tools)
+\end_layout
+
+\begin_layout Itemize
+Verifiy that the closed-loop system performs as desired (avoid infeasibility,
+ unstability)
+\end_layout
+
+\begin_layout Itemize
+Make sure it runs in real-time
+\end_layout
+
+\begin_layout Subsection
+MPC with Continuous Time models
+\end_layout
+
+\begin_layout Standard
+Use e.g.
+ Euler Discretization of Nonlinear Models.
+ Given a CT model 
+\begin_inset Formula 
+\[
+\begin{cases}
+\frac{d}{dt}x(t) & =f(x(t),u(t),t)\\
+y(t) & =h(x(t),u(t),t)
+\end{cases}
+\]
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+We approximate with finite differences:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\frac{d}{dt}x(t)\approx\frac{x(t+\Delta t)-x(t)}{\Delta t}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\Delta t$
+\end_inset
+
+ is the sampling time 
+\end_layout
+
+\begin_layout Standard
+Use Euler discretization or better discretization approaches (cf matlab:
+ help c2d) and check the performance of your model data vs simulated.
+\end_layout
+
+\begin_layout Section
+Optimization
+\end_layout
+
+\begin_layout Subsection
+Convex optimization problems
+\end_layout
+
+\begin_layout Itemize
+A set 
+\begin_inset Formula $\mathcal{S}$
+\end_inset
+
+ is convex if 
+\begin_inset Formula $\lambda z_{1}+(1-\lambda)z_{2}\in\mathcal{S}$
+\end_inset
+
+ for all 
+\begin_inset Formula $z_{1},z_{2}\in\mathcal{S},\lambda\in[0,1]$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+A function 
+\begin_inset Formula $f:\mathcal{S\rightarrow\mathbb{R}}$
+\end_inset
+
+ is convex if
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Formula $\mathcal{S}$
+\end_inset
+
+ is convex
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $f(\lambda z_{1}+(1-\lambda)z_{2})\leq\lambda f(z_{1})+(1-\lambda)f(z_{2})$
+\end_inset
+
+ for all 
+\begin_inset Formula $z_{1},z_{2}\in\mathcal{S},\lambda\in[0,1]$
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+A function 
+\begin_inset Formula $f:\mathcal{S\rightarrow\mathbb{R}}$
+\end_inset
+
+ is concave if 
+\begin_inset Formula $\mathcal{S}$
+\end_inset
+
+ is convex and 
+\begin_inset Formula $-f$
+\end_inset
+
+ is convex 
+\end_layout
+
+\begin_layout Itemize
+Some operations preserve convexity: intersection of convex sets, 
+\begin_inset Formula $f(Ax+b)$
+\end_inset
+
+ ...
+\end_layout
+
+\begin_layout Standard
+An optimization problem is said to be convex if the cost function 
+\begin_inset Formula $f$
+\end_inset
+
+ is convex over a convex set.
+ A fundamental property of convex optimization is that local optimizers
+ are also global optimizers.
+ It suffices to compute a local minimum to determine its global minimum.
+ Non-convex problems can be transformed into convex problems through a change
+ of variables and manipulations on cost and constraints.
+\end_layout
+
+\begin_layout Subsection
+Optimality conditions
+\end_layout
+
+\begin_layout Subsection
+Optimization algorithm: overall intuitive presentation
+\end_layout
+
+\begin_layout Subsection
+Optimization tools
+\end_layout
+
+\end_body
+\end_document
