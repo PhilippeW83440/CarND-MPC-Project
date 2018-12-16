@@ -1,10 +1,15 @@
 # Additional resources
 
+MPC:  
 https://sites.google.com/site/mpclaboratory/mpc-course-material  
 https://github.com/JuliaMPC  
 https://github.com/MPC-Berkeley  
+  
+Optimization:  
 https://web.stanford.edu/group/sisl/k12/optimization/#!index.md  
 https://github.com/sisl/aa222-notebook  
+http://faculty.cas.usf.edu/jkwilde/mathcamp/math_camp.htm  
+
 
   
 # CarND-Controls-MPC
