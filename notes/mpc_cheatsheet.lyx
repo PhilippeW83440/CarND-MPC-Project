@@ -350,7 +350,7 @@ We approximate with finite differences:
 
 \begin_layout Standard
 Use Euler discretization or better discretization approaches (cf matlab:
- help c2d) and check the performance of your model data vs simulated.
+ help c2d) and check the performance of your model: data vs simulated.
 \end_layout
 
 \begin_layout Section
@@ -423,6 +423,10 @@ A function
 
 \begin_layout Itemize
 Some operations preserve convexity: intersection of convex sets, 
+\begin_inset Formula $\sum_{i=1}^{N}\alpha_{i}f_{i}$
+\end_inset
+
+, 
 \begin_inset Formula $f(Ax+b)$
 \end_inset
 
@@ -446,12 +450,332 @@ An optimization problem is said to be convex if the cost function
 Optimality conditions
 \end_layout
 
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\underset{z}{min}f(z)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\text{such that }\begin{cases}
+g_{i}(z)\leq0 & \text{for }i=1,\ldots,m\\
+h_{i}(z)=0 & \text{for }i=1,\ldots,p\\
+z\in\mathcal{Z}
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+In general, an analytical solution does not exist
+\end_layout
+
+\begin_layout Itemize
+In general, global optimality is not guaranteed
+\end_layout
+
+\begin_layout Itemize
+Solutions are usualy computed by 
+\series bold
+recursive algorithms
+\series default
+ which start from an initial guess 
+\begin_inset Formula $z_{0}$
+\end_inset
+
+ and at step 
+\begin_inset Formula $k$
+\end_inset
+
+ generate a point 
+\begin_inset Formula $z_{k}$
+\end_inset
+
+ such that 
+\begin_inset Formula $\{f(z_{k})\}_{k=0,1,2,\ldots}$
+\end_inset
+
+ converges to 
+\begin_inset Formula $J^{*}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Gradient descent algorithms
+\end_layout
+
+\begin_layout Itemize
+For unconstrained optimization problems, optimality conditions are:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Formula $\nabla f(z^{*})=0$
+\end_inset
+
+ is a necessary condition for 
+\begin_inset Formula $z^{*}$
+\end_inset
+
+ to be a local minimizer
+\end_layout
+
+\begin_layout Itemize
+If 
+\begin_inset Formula $\nabla f(z^{*})=0$
+\end_inset
+
+ and Hessian of 
+\begin_inset Formula $H_{f}(z^{*})$
+\end_inset
+
+ is positive definite then 
+\begin_inset Formula $z^{*}$
+\end_inset
+
+ is a local minimizer
+\end_layout
+
+\begin_layout Itemize
+If 
+\begin_inset Formula $f$
+\end_inset
+
+ is convex differentiable at 
+\begin_inset Formula $z^{*}$
+\end_inset
+
+ then 
+\begin_inset Formula $z^{*}$
+\end_inset
+
+ is a global minimizer iff 
+\begin_inset Formula $\nabla f(z^{*})=0$
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+For constrained optimization problems, optimality KKT conditions are:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Formula $\nabla f(z^{*})+\sum_{i=1}^{m}u_{i}^{*}\nabla g_{i}(z^{*})+\sum_{j=1}^{p}v_{j}^{*}\nabla h_{i}(z^{*})=0$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+cf Lagrange Multipliers: 
+\begin_inset Formula 
+\[
+\text{min }f(x,y)\text{ s.t. }g_{1}(x,y)=0,\ldots,g_{k}(x,y)=0
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\text{solve }\nabla f(a)=\sum_{i=1}^{k}\lambda_{i}\nabla g_{i}(a)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\text{2 eqs (partial derivatives) + k eqs g_{i}(x,y)=0 with 2+k unknowns (\ensuremath{x^{*},y^{*},\lambda_{1},\ldots,\lambda_{k})} }
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Graphics
+	filename lagrange.png
+	scale 25
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $u_{i}^{*}g_{i}(z^{*})=0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $u_{i}^{*}\geq0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $g_{i}(z^{*})\leq0$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $h_{j}(z^{*})=0$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Subsection
 Optimization algorithm: overall intuitive presentation
 \end_layout
 
+\begin_layout Standard
+The algorithms are explained in an easy way here: 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "Constrained Optimization explained to HighSchool with Calculus AB"
+target "https://web.stanford.edu/group/sisl/k12/optimization/MO-unit5-pdfs/5.3phase1.pdf"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+What you need to know: computing Gradients, Jacobian, Hessian on simple
+ functions, roots finding, following the gradient
+\end_layout
+
+\begin_layout Paragraph
+Example Gradient 
+\end_layout
+
+\begin_layout Standard
+James B.
+ was located at 
+\begin_inset Formula $(1,1)$
+\end_inset
+
+.
+ To choose his new location he calculates the gradient of the function 
+\begin_inset Formula $f(x,y)=x^{2}+y^{2}-3xy+x$
+\end_inset
+
+ at his current position and moves in the direction that is given by its
+ calculated gradient at the point and distance traveled is the length of
+ the gradient.
+ Where he will find himself after two movements?
+\end_layout
+
+\begin_layout Paragraph
+Example Jacobian 
+\end_layout
+
+\begin_layout Standard
+Compute the Jacobian of 
+\begin_inset Formula $f:\mathbb{R}^{2}\rightarrow\mathbb{R}^{2}$
+\end_inset
+
+ with 
+\begin_inset Formula $y_{1}=x_{1}x_{2},y_{2}=x_{1}+x_{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Example Hessian 
+\end_layout
+
+\begin_layout Standard
+Compute the Hessian of 
+\begin_inset Formula $f(x,y)=x^{3}-2xy-y^{6}$
+\end_inset
+
+ at the point 
+\begin_inset Formula $(1,2)$
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Optimization tools
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "MPC examples in Python and Matlab"
+target "https://osqp.org/docs/examples/mpc.html"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+NPSOL
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "CVXGEN"
+target "https://cvxgen.com/docs/mpc.html"
+literal "false"
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+Matlab Optimization toolbox: fmincon, cvx
+\end_layout
+
+\begin_layout Itemize
+C++ 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ipopt with CppAd"
+target "https://www.coin-or.org/CppAD/Doc/ipopt_solve_get_started.cpp.htm"
+literal "false"
+
+\end_inset
+
+ (CppAd performs automatic differentiation when gradient, Jacobian, Hessian
+ are needed)
 \end_layout
 
 \end_body
