@@ -84,7 +84,19 @@
 \begin_body
 
 \begin_layout Title
-MPC cheatsheet
+Model Predictive Control
+\end_layout
+
+\begin_layout Author
+Philippe Weingertner for Polytech Sophia 
+\begin_inset Quotes eld
+\end_inset
+
+Conduite Autonome
+\begin_inset Quotes erd
+\end_inset
+
+ course
 \end_layout
 
 \begin_layout Section
@@ -661,7 +673,7 @@ The algorithms are explained in an easy way here:
 \begin_layout Itemize
 \begin_inset CommandInset href
 LatexCommand href
-name "Constrained Optimization explained to HighSchool with Calculus AB"
+name "Constrained Optimization explained for HighSchool with Calculus AB"
 target "https://web.stanford.edu/group/sisl/k12/optimization/MO-unit5-pdfs/5.3phase1.pdf"
 literal "false"
 
@@ -671,8 +683,10 @@ literal "false"
 \end_layout
 
 \begin_layout Standard
-What you need to know: computing Gradients, Jacobian, Hessian on simple
- functions, roots finding, following the gradient
+It is an iterative algorithm based on gradient descent where we check that
+ descent happens within the constraints region.
+ Bare minimum you need to know: computing Gradients, Jacobian, Hessian on
+ simple functions, roots finding, following the gradient.
 \end_layout
 
 \begin_layout Paragraph
@@ -776,6 +790,24 @@ literal "false"
 
  (CppAd performs automatic differentiation when gradient, Jacobian, Hessian
  are needed)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintAll"
+bibfiles "mpc"
+
+\end_inset
+
+
 \end_layout
 
 \end_body
