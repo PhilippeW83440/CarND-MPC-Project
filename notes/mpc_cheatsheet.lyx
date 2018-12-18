@@ -99,6 +99,15 @@ Conduite Autonome
  course
 \end_layout
 
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Model Predictive Control
 \end_layout
@@ -224,11 +233,12 @@ We are solving
 \begin_inset Formula $\underset{u_{t:t+N-1}}{min}\sum_{k=t}^{t+N-1}l(x_{k},u_{k})$
 \end_inset
 
- and not 
+ and NOT 
 \begin_inset Formula $\underset{u_{[t:t+N-1]}}{min}\int_{t}^{t+N}l(x(\tau),u(\tau)d\tau$
 \end_inset
 
- !!! Soon or later you need to discretize anyways
+.
+ Sooner or later you need to discretize anyways
 \end_layout
 
 \begin_layout Standard
@@ -363,6 +373,90 @@ We approximate with finite differences:
 \begin_layout Standard
 Use Euler discretization or better discretization approaches (cf matlab:
  help c2d) and check the performance of your model: data vs simulated.
+\end_layout
+
+\begin_layout Subsection
+MPC solution via Batch Approach
+\end_layout
+
+\begin_layout Itemize
+Write the equality constraints explicitly:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\begin{array}{c}
+x_{1}=f(x_{0},u_{0})\\
+\vdots\\
+x_{N}=f(x_{N-1},u_{N-1})
+\end{array}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Then the optimal control problem:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\underset{u_{0},u_{1},\ldots,u_{N-1}}{min}\sum_{k=0}^{N-1}l(x_{k},u_{k})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\text{subj. to }\begin{cases}
+x_{1}=f(x_{0},u_{0})\\
+\vdots\\
+x_{N}=f(x_{N-1},u_{N-1})\\
+u_{k}\in\mathcal{U} & k=0,\ldots,N-1\\
+x_{k}\in\mathcal{X} & k=0,\ldots,N-1\\
+x_{0}=x(0) & k=0,\ldots,t+N-1
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+is a general nonlinear programming problem with variable
+\begin_inset Formula 
+\[
+\boxed{{u_{0},\ldots,u_{N-1},x_{1},\ldots,x_{N}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+After resolution, 
+\series bold
+apply
+\series default
+ only: 
+\begin_inset Formula 
+\[
+\boxed{u_{0}}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
